@@ -1,0 +1,77 @@
+# Назва пайплайну, яка буде відображатися у вкладці Actions в GitHub
+name: Frontend CI/CD
+
+# Події, які запускають пайплайн
+on:
+  # Запуск при push у вказані гілки
+  push:
+    branches:
+      - main
+      - develop
+
+  # Запуск при створенні або оновленні Pull Request
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  # Job для перевірки та збірки frontend-проєкту
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest   # Використовується віртуальна машина з Ubuntu
+
+    defaults:
+      run:
+        working-directory: ./   # Команди run виконуються в корені репозиторію
+
+    steps:
+      # Крок 1: Завантаження коду репозиторію на віртуальну машину
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Крок 2: Встановлення Node.js для виконання frontend-команд
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'   # Версія Node.js
+          cache: 'npm'         # Кешування npm залежностей для пришвидшення збірки
+
+      # Крок 3: Встановлення всіх залежностей проєкту
+      - name: Install dependencies
+        run: npm install
+
+      # Крок 4: Перевірка форматування коду за допомогою Prettier
+      - name: Check formatting
+        run: npm run format:check
+
+      # Крок 5: Статичний аналіз коду за допомогою ESLint
+      - name: Lint code
+        run: npm run lint
+
+      # Крок 6: Збірка frontend-проєкту
+      - name: Build project
+        run: npm run build
+
+  # Job для автоматичного розгортання застосунку
+  deploy:
+    name: Deploy to Vercel
+    needs: build-frontend   # Деплой запускається тільки після успішної збірки
+    runs-on: ubuntu-latest
+
+    # Деплой виконується тільки при push у гілку main
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      # Крок 1: Завантаження коду репозиторію
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Крок 2: Деплой frontend застосунку на платформу Vercel
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}       # Токен доступу до Vercel
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}     # ID організації Vercel
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }} # ID проєкту
+          vercel-args: '--prod'                           # Деплой у production

@@ -1,0 +1,372 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #fff2ea;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 5px;
+}
+
+.app-container {
+  width: 393px;
+  background-color: #fff2ea;
+  padding: 5px;
+  position: relative;
+}
+
+/* Main View Styles */
+.main-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.greeting-text {
+  font-size: 30px;
+  font-weight: 300;
+  color: black;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.subtitle-text {
+  font-size: 22px;
+  font-weight: 300;
+  color: black;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pet-image {
+  width: 170px;
+  height: 207px;
+  object-fit: contain;
+  margin: 10px 0;
+}
+
+.button {
+  background-color: #ce9e7a;
+  border: 3px solid black;
+  border-radius: 9px;
+  color: black;
+  font-size: 22px;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #a66c4a;
+}
+
+.button:disabled {
+  background-color: #ce9e7a;
+  color: #a66c4a;
+  cursor: not-allowed;
+}
+
+.feed-button {
+  width: 170px;
+  height: 44px;
+}
+
+.goal-text {
+  font-size: 22px;
+  font-weight: 300;
+  color: black;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.info-container {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.info-box {
+  background-color: white;
+  border: 3px solid black;
+  border-radius: 9px;
+  width: 138px;
+  height: 61px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+.info-number {
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+}
+
+.info-label {
+  font-size: 18px;
+  color: #585858;
+}
+
+.hunger-box {
+  background-color: white;
+  border: 3px solid black;
+  border-radius: 9px;
+  width: 280px;
+  height: 61px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  margin: 10px 0;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.focus-button {
+  width: 226px;
+  height: 65px;
+}
+
+.settings-button {
+  width: 65px;
+  height: 65px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-icon {
+  width: 30px;
+  height: 30px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #fff2ea;
+  border-radius: 9px;
+  padding: 20px;
+  padding-bottom: 30px;
+  max-width: 393px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  font-size: 35px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Feed Modal */
+.money-display {
+  background-color: #ce9e7a;
+  border: 3px solid black;
+  border-radius: 9px;
+  padding: 10px 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  margin: 20px auto;
+  width: fit-content;
+}
+
+.feed-modal-button {
+  width: 301px;
+  height: 44px;
+  margin: 10px auto;
+  display: block;
+}
+
+/* Focus Modal */
+.focus-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-display {
+  font-size: 49px;
+  color: black;
+  font-weight: normal;
+  margin: 10px 0;
+}
+
+.slider-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.slider {
+  width: 185px;
+  height: 8px;
+  border-radius: 5px;
+  background: #ce9e7a;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+  border: none;
+}
+
+.focus-modal-button {
+  width: 170px;
+  height: 44px;
+  margin: 5px;
+}
+
+/* Settings Modal */
+.settings-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.animal-selector {
+  background-color: #ce9e7a;
+  border: 3px solid black;
+  border-radius: 9px;
+  padding: 5px 20px;
+  font-size: 20px;
+  font-family: 'Montserrat', sans-serif;
+  color: black;
+  width: 229px;
+  height: 41px;
+  cursor: pointer;
+}
+
+.input-label {
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+  margin-top: 10px;
+}
+
+.input-field {
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 22px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  color: #494949;
+  width: 301px;
+  height: 40px;
+}
+
+.input-field::placeholder {
+  color: #aaaaaa;
+}
+
+.validation-error {
+  color: #ff3b30;
+  font-size: 14px;
+  font-weight: 300;
+  margin-top: -10px;
+  text-align: center;
+}
+
+.save-button {
+  width: 228px;
+  height: 50px;
+  margin-top: 10px;
+}
+
+/* Popup/Error Modal */
+.popup-modal {
+  width: 393px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.popup-message {
+  background-color: white;
+  border: 3px solid black;
+  border-radius: 9px;
+  padding: 20px 35px;
+  font-size: 22px;
+  color: black;
+  text-align: center;
+  width: 301px;
+}
+
+.close-button {
+  width: 190px;
+  height: 60px;
+}
+
+/* Scrollbar Styles */
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: #fff2ea;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: #ce9e7a;
+  border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: #a66c4a;
+}
