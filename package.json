@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
     "posthog-js": "^1.363.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -19,8 +20,12 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.1.1",
-    "serve": "^14.2.1"
+    "eslint": "^8.39.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier": "^3.8.1",
+    "serve": "^14.2.6"
   },
   "eslintConfig": {
     "extends": [

@@ -4,9 +4,9 @@ import analytics from '../services/analytics';
 
 function FeedModal({ petState, onClose, refreshPetState, onError }) {
   const [hungerTime, setHungerTime] = useState({ hours: 0, minutes: 0 });
+  const [feeding, setFeeding] = useState(false);
 
   useEffect(() => {
-    // Відстежити відкриття модалки годування
     analytics.capture('feed_modal_opened', {
       currentMoney: petState.totalMoney,
       hungerLevel: petState.activeTimesAte,
@@ -24,37 +24,36 @@ function FeedModal({ petState, onClose, refreshPetState, onError }) {
     return () => clearInterval(interval);
   }, [updateHungerTime]);
 
-  const handleFeed = () => {
+  const handleFeed = async () => {
+    if (feeding) return;
+    setFeeding(true);
+
     try {
       const moneyBefore = petState.totalMoney;
-      PetService.feedPet();
+      await PetService.feedPet();
 
-      // Відстежити успішне годування
       analytics.capture('pet_fed', {
-        moneyBefore: moneyBefore,
+        moneyBefore,
         moneyAfter: moneyBefore - 50,
         totalTimesAte: petState.totalTimesAte + 1,
         animalType: petState.animalImagePath,
       });
 
-      refreshPetState();
+      await refreshPetState();
       updateHungerTime();
     } catch (error) {
-      // Відстежити помилку
       analytics.capture('feed_failed', {
         reason: error.message,
         currentMoney: petState.totalMoney,
       });
-
       onError(error.message);
+    } finally {
+      setFeeding(false);
     }
   };
 
   const handleClose = () => {
-    // Відстежити закриття без годування
-    analytics.capture('feed_modal_closed', {
-      fedPet: false,
-    });
+    analytics.capture('feed_modal_closed', { fedPet: false });
     onClose();
   };
 
@@ -84,8 +83,8 @@ function FeedModal({ petState, onClose, refreshPetState, onError }) {
             <div className="info-label">will be hungry in</div>
           </div>
 
-          <button className="button feed-modal-button" onClick={handleFeed}>
-            Feed {petState.animalName} 50 ⍟
+          <button className="button feed-modal-button" onClick={handleFeed} disabled={feeding}>
+            {feeding ? 'Feeding...' : `Feed ${petState.animalName} 50 ⍟`}
           </button>
 
           <button className="button feed-modal-button" onClick={handleClose}>

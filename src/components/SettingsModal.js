@@ -7,15 +7,14 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
   const [animalName, setAnimalName] = useState('');
   const [focusGoal, setFocusGoal] = useState('');
   const [selectedAnimal, setSelectedAnimal] = useState('bear_img.png');
+  const [saving, setSaving] = useState(false);
 
   const [usernameError, setUsernameError] = useState('');
   const [animalNameError, setAnimalNameError] = useState('');
   const [goalError, setGoalError] = useState('');
 
   useEffect(() => {
-    // Відстежити відкриття налаштувань
     analytics.capture('settings_opened');
-
     if (petState) {
       setUsername(petState.username);
       setAnimalName(petState.animalName);
@@ -55,36 +54,11 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     return true;
   };
 
-  const handleUsernameChange = (e) => {
-    const value = e.target.value;
-    setUsername(value);
-    validateUsername(value);
-  };
-
-  const handleAnimalNameChange = (e) => {
-    const value = e.target.value;
-    setAnimalName(value);
-    validateAnimalName(value);
-  };
-
-  const handleGoalChange = (e) => {
-    const value = e.target.value;
-    setFocusGoal(value);
-    validateGoal(value);
-  };
-
   const handleAnimalChange = (e) => {
-    const newAnimal = e.target.value;
-    const animalMap = {
-      Bear: 'bear_img.png',
-      Cat: 'cat_img.png',
-      Bunny: 'bunny_img.png',
-    };
-    const newAnimalPath = animalMap[newAnimal];
-
+    const animalMap = { Bear: 'bear_img.png', Cat: 'cat_img.png', Bunny: 'bunny_img.png' };
+    const newAnimalPath = animalMap[e.target.value];
     setSelectedAnimal(newAnimalPath);
 
-    // Відстежити зміну тварини
     if (newAnimalPath !== petState.animalImagePath) {
       analytics.capture('animal_changed', {
         from: petState.animalImagePath,
@@ -93,7 +67,7 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const isUsernameValid = validateUsername(username);
     const isAnimalNameValid = validateAnimalName(animalName);
     const isGoalValid = validateGoal(focusGoal);
@@ -104,7 +78,6 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
         animalNameError: !isAnimalNameValid,
         goalError: !isGoalValid,
       });
-
       onError('Please fix the validation errors before saving');
       return;
     }
@@ -114,52 +87,44 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
       return;
     }
 
+    setSaving(true);
     try {
       const changes = {};
-
-      if (username !== petState.username) {
+      if (username !== petState.username)
         changes.username = { from: petState.username, to: username };
-      }
-      if (animalName !== petState.animalName) {
+      if (animalName !== petState.animalName)
         changes.animalName = { from: petState.animalName, to: animalName };
-      }
-      if (parseInt(focusGoal) !== petState.focusGoal) {
+      if (parseInt(focusGoal) !== petState.focusGoal)
         changes.focusGoal = { from: petState.focusGoal, to: parseInt(focusGoal) };
-      }
-      if (selectedAnimal !== petState.animalImagePath) {
+      if (selectedAnimal !== petState.animalImagePath)
         changes.animalType = { from: petState.animalImagePath, to: selectedAnimal };
-      }
 
-      PetService.updateSettings({
+      await PetService.updateSettings({
         username: username.trim(),
         animalName: animalName.trim(),
         focusGoal: parseInt(focusGoal),
         animalImagePath: selectedAnimal,
       });
 
-      // Відстежити успішне збереження
       analytics.capture('settings_saved', {
-        changes: changes,
+        changes,
         changesCount: Object.keys(changes).length,
       });
 
-      // Оновити ідентифікацію користувача
       analytics.identify(username.trim(), {
         animalName: animalName.trim(),
         animalType: selectedAnimal,
         focusGoal: parseInt(focusGoal),
       });
 
-      refreshPetState();
+      await refreshPetState();
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
-
-      analytics.capture('settings_save_failed', {
-        error: error.message,
-      });
-
+      analytics.capture('settings_save_failed', { error: error.message });
       onError('Failed to save settings');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -173,11 +138,7 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
   };
 
   const getCurrentAnimalName = () => {
-    const nameMap = {
-      'bear_img.png': 'Bear',
-      'cat_img.png': 'Cat',
-      'bunny_img.png': 'Bunny',
-    };
+    const nameMap = { 'bear_img.png': 'Bear', 'cat_img.png': 'Cat', 'bunny_img.png': 'Bunny' };
     return nameMap[selectedAnimal] || 'Bear';
   };
 
@@ -204,7 +165,10 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="single word only"
           value={username}
-          onChange={handleUsernameChange}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            validateUsername(e.target.value);
+          }}
         />
         {usernameError && <div className="validation-error">{usernameError}</div>}
 
@@ -214,7 +178,10 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="single word only"
           value={animalName}
-          onChange={handleAnimalNameChange}
+          onChange={(e) => {
+            setAnimalName(e.target.value);
+            validateAnimalName(e.target.value);
+          }}
         />
         {animalNameError && <div className="validation-error">{animalNameError}</div>}
 
@@ -224,12 +191,15 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="numbers only"
           value={focusGoal}
-          onChange={handleGoalChange}
+          onChange={(e) => {
+            setFocusGoal(e.target.value);
+            validateGoal(e.target.value);
+          }}
         />
         {goalError && <div className="validation-error">{goalError}</div>}
 
-        <button className="button save-button" onClick={handleSave}>
-          Save
+        <button className="button save-button" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save'}
         </button>
       </div>
     </div>
