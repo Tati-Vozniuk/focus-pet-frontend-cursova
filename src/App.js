@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import AuthPage from './components/AuthPage';
 import MainView from './components/MainView';
 import FeedModal from './components/FeedModal';
 import FocusModal from './components/FocusModal';
 import SettingsModal from './components/SettingsModal';
 import PopupModal from './components/PopupModal';
 import PetService from './services/petService';
+import supabase from './services/supabaseClient';
 import analytics from './services/analytics';
 
 function App() {
+  const [session, setSession] = useState(undefined); // undefined = ще перевіряємо
   const [petState, setPetState] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFeedModal, setShowFeedModal] = useState(false);
@@ -27,7 +30,19 @@ function App() {
     setShowPopup(true);
   };
 
-  // getPetState тепер async — чекаємо результат
+  // Слухаємо зміни сесії (логін / логаут)
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const fetchPetState = useCallback(async () => {
     try {
       const data = await PetService.getPetState();
@@ -48,31 +63,46 @@ function App() {
     }
   }, []);
 
+  // Завантажуємо дані тільки якщо є сесія
   useEffect(() => {
+    if (session === undefined) return; // ще чекаємо
+
     analytics.init();
     analytics.capture('app_loaded', {
       env: process.env.REACT_APP_ENV,
       version: process.env.REACT_APP_VERSION,
     });
-    fetchPetState();
-  }, [fetchPetState]);
+
+    if (session) {
+      fetchPetState();
+    } else {
+      setLoading(false);
+    }
+  }, [session, fetchPetState]);
 
   const handleFocusComplete = (minutes) => {
     setShowFocusModal(false);
     showSuccess(`You've earned ${minutes} ⍟`);
   };
 
+  // Ще перевіряємо сесію
+  if (session === undefined) {
+    return (
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  // Не авторизований — показуємо екран входу
+  if (!session) {
+    return <AuthPage onAuthSuccess={() => {}} />;
+  }
+
+  // Авторизований, але дані ще вантажяться
   if (loading) {
     return (
-      <div
-        className="app-container"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <p>Loading...</p>
       </div>
     );

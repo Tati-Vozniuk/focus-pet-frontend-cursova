@@ -13,7 +13,7 @@ import supabase from './supabaseClient';
 let _cachedState = null;
 
 // -----------------------------------------------------------------------
-// Маппінг: колонки БД  →  поля React-стану і назад
+// Маппінг: колонки БД → поля React-стану і назад
 // -----------------------------------------------------------------------
 function dbToState(row) {
   return {
@@ -69,30 +69,39 @@ const DEFAULT_STATE = {
 };
 
 // -----------------------------------------------------------------------
+// Хелпер: отримати поточного авторизованого юзера
+// -----------------------------------------------------------------------
+async function getAuthUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  if (!user) throw new Error('Not authenticated');
+  return user;
+}
+
+// -----------------------------------------------------------------------
 // PetService
 // -----------------------------------------------------------------------
 class PetService {
   // ---- Отримати стан (з БД або з кешу) --------------------------------
   static async getPetState() {
     try {
+      const user = await getAuthUser();
+
       const { data, error } = await supabase
         .from('pet_state')
         .select('*')
-        .order('id', { ascending: true })
-        .limit(1)
+        .eq('user_id', user.id)
         .single();
 
       if (error) {
         // Рядка ще нема — створюємо новий
         if (error.code === 'PGRST116') {
-          return await this._createInitialState();
+          return await this._createInitialState(user);
         }
         throw error;
       }
 
       let state = dbToState(data);
-
-      // Логіка яка раніше була в localStorage-версії
       state = await this._updateActiveTimesAte(state);
       state = await this._checkAndResetDailyFocus(state);
 
@@ -100,17 +109,19 @@ class PetService {
       return state;
     } catch (err) {
       console.error('getPetState error:', err);
-      // Якщо немає з'єднання — повертаємо кеш або дефолт
       return _cachedState ?? DEFAULT_STATE;
     }
   }
 
   // ---- Зберегти стан в БД ---------------------------------------------
   static async savePetState(state) {
+    const user = await getAuthUser();
+
     const { data, error } = await supabase
       .from('pet_state')
       .update(stateToDb(state))
       .eq('id', state.id)
+      .eq('user_id', user.id) // захист: не можна оновити чужий рядок
       .select()
       .single();
 
@@ -142,7 +153,6 @@ class PetService {
 
     const saved = await this.savePetState(newState);
 
-    // Записати в feeding_history
     await supabase.from('feeding_history').insert({
       pet_id: state.id,
       cost: 50,
@@ -171,7 +181,6 @@ class PetService {
 
     const saved = await this.savePetState(newState);
 
-    // Записати в focus_sessions
     await supabase.from('focus_sessions').insert({
       pet_id: state.id,
       completed_at: new Date().toISOString(),
@@ -223,18 +232,29 @@ class PetService {
     const state = await this.getPetState();
     if (!state.id) return DEFAULT_STATE;
 
+    const user = await getAuthUser();
+
     // Видалити пов'язані записи (каскад у БД це робить автоматично)
-    await supabase.from('pet_state').delete().eq('id', state.id);
+    await supabase
+      .from('pet_state')
+      .delete()
+      .eq('id', state.id)
+      .eq('user_id', user.id); // захист: не можна видалити чужий рядок
+
     _cachedState = null;
-    return await this._createInitialState();
+    return await this._createInitialState(user);
   }
 
   // ---- Приватні хелпери ------------------------------------------------
 
-  static async _createInitialState() {
+  static async _createInitialState(user) {
+    // Якщо user не передано — отримуємо самі (для зворотної сумісності)
+    const authUser = user ?? (await getAuthUser());
+
     const { data, error } = await supabase
       .from('pet_state')
       .insert({
+        user_id: authUser.id, // прив'язуємо запис до конкретного юзера
         username: DEFAULT_STATE.username,
         animal_name: DEFAULT_STATE.animalName,
         animal_type: DEFAULT_STATE.animalImagePath,
@@ -245,6 +265,7 @@ class PetService {
       .single();
 
     if (error) throw error;
+
     const state = dbToState(data);
     _cachedState = state;
     return state;
