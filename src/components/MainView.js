@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PetService from '../services/petService';
 
-function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings }) {
+function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout }) {
   const [hungerTime, setHungerTime] = useState({ hours: 0, minutes: 0 });
   const [remainingFocus, setRemainingFocus] = useState(0);
 
@@ -86,6 +86,21 @@ function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings }) {
           <span className="settings-icon">⚙️</span>
         </button>
       </div>
+
+      <button
+        onClick={onLogout}
+        style={{
+          marginTop: '16px',
+          background: 'transparent',
+          border: 'none',
+          color: 'var(--color-text, #888)',
+          fontSize: '13px',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+        }}
+      >
+        Log out
+      </button>
     </div>
   );
 }

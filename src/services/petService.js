@@ -1,15 +1,10 @@
 /**
- * PetService - Supabase версія
- * Зберігає дані в PostgreSQL через Supabase REST API
- *
- * Таблиці: pet_state, feeding_history, focus_sessions
+ * PetService - Supabase версія з авторизацією
+ * Кожен користувач має власний рядок у pet_state, прив'язаний до user_id
  */
 
 import supabase from './supabaseClient';
 
-// -----------------------------------------------------------------------
-// Внутрішній кеш — щоб не дергати БД при кожному рендері
-// -----------------------------------------------------------------------
 let _cachedState = null;
 
 // -----------------------------------------------------------------------
@@ -18,9 +13,10 @@ let _cachedState = null;
 function dbToState(row) {
   return {
     id: row.id,
+    userId: row.user_id,
     username: row.username,
     animalName: row.animal_name,
-    animalImagePath: row.animal_type, // bear_img.png / cat_img.png / bunny_img.png
+    animalImagePath: row.animal_type,
     focusGoal: row.focus_goal,
     todayFocused: row.today_focused,
     totalTime: row.total_time,
@@ -50,9 +46,6 @@ function stateToDb(state) {
   };
 }
 
-// -----------------------------------------------------------------------
-// Початковий стан (якщо рядка ще нема в БД)
-// -----------------------------------------------------------------------
 const DEFAULT_STATE = {
   username: 'Username',
   animalName: 'Animal',
@@ -69,34 +62,35 @@ const DEFAULT_STATE = {
 };
 
 // -----------------------------------------------------------------------
-// Хелпер: отримати поточного авторизованого юзера
+// Helper: get current authenticated user (throws if not logged in)
 // -----------------------------------------------------------------------
-async function getAuthUser() {
+async function getCurrentUserId() {
   const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  if (!user) throw new Error('Not authenticated');
-  return user;
+  if (error || !user) throw new Error('User not authenticated');
+  return user.id;
 }
 
 // -----------------------------------------------------------------------
 // PetService
 // -----------------------------------------------------------------------
 class PetService {
-  // ---- Отримати стан (з БД або з кешу) --------------------------------
+  // ---- Отримати стан --------------------------------------------------
   static async getPetState() {
     try {
-      const user = await getAuthUser();
+      const userId = await getCurrentUserId();
 
       const { data, error } = await supabase
         .from('pet_state')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
+        .order('id', { ascending: true })
+        .limit(1)
         .single();
 
       if (error) {
-        // Рядка ще нема — створюємо новий
         if (error.code === 'PGRST116') {
-          return await this._createInitialState(user);
+          // No row yet — create one for this user
+          return await this._createInitialState(userId);
         }
         throw error;
       }
@@ -113,15 +107,15 @@ class PetService {
     }
   }
 
-  // ---- Зберегти стан в БД ---------------------------------------------
+  // ---- Зберегти стан --------------------------------------------------
   static async savePetState(state) {
-    const user = await getAuthUser();
+    if (!state.id) throw new Error('Cannot save state: missing id');
 
     const { data, error } = await supabase
       .from('pet_state')
       .update(stateToDb(state))
       .eq('id', state.id)
-      .eq('user_id', user.id) // захист: не можна оновити чужий рядок
+      .eq('user_id', state.userId) // extra safety — RLS also enforces this
       .select()
       .single();
 
@@ -155,6 +149,7 @@ class PetService {
 
     await supabase.from('feeding_history').insert({
       pet_id: state.id,
+      user_id: state.userId,
       cost: 50,
       money_before: moneyBefore,
       money_after: newState.totalMoney,
@@ -169,7 +164,8 @@ class PetService {
     const state = await this.getPetState();
     const today = new Date().toISOString().split('T')[0];
     const goalCompleted =
-      state.todayFocused + minutes >= state.focusGoal && state.todayFocused < state.focusGoal;
+      state.todayFocused + minutes >= state.focusGoal &&
+      state.todayFocused < state.focusGoal;
 
     const newState = {
       ...state,
@@ -183,6 +179,7 @@ class PetService {
 
     await supabase.from('focus_sessions').insert({
       pet_id: state.id,
+      user_id: state.userId,
       completed_at: new Date().toISOString(),
       duration_minutes: minutes,
       earned_money: minutes,
@@ -208,7 +205,7 @@ class PetService {
     return await this.savePetState(newState);
   }
 
-  // ---- Час до голоду (синхронний, рахується з кешу) -------------------
+  // ---- Час до голоду (синхронний) -------------------------------------
   static getHungerTime(state) {
     const now = new Date();
     const lastFeed = new Date(state.lastFeedTime);
@@ -232,29 +229,19 @@ class PetService {
     const state = await this.getPetState();
     if (!state.id) return DEFAULT_STATE;
 
-    const user = await getAuthUser();
-
-    // Видалити пов'язані записи (каскад у БД це робить автоматично)
-    await supabase
-      .from('pet_state')
-      .delete()
-      .eq('id', state.id)
-      .eq('user_id', user.id); // захист: не можна видалити чужий рядок
-
+    await supabase.from('pet_state').delete().eq('id', state.id);
     _cachedState = null;
-    return await this._createInitialState(user);
+    const userId = await getCurrentUserId();
+    return await this._createInitialState(userId);
   }
 
-  // ---- Приватні хелпери ------------------------------------------------
+  // ---- Приватні хелпери -----------------------------------------------
 
-  static async _createInitialState(user) {
-    // Якщо user не передано — отримуємо самі (для зворотної сумісності)
-    const authUser = user ?? (await getAuthUser());
-
+  static async _createInitialState(userId) {
     const { data, error } = await supabase
       .from('pet_state')
       .insert({
-        user_id: authUser.id, // прив'язуємо запис до конкретного юзера
+        user_id: userId,
         username: DEFAULT_STATE.username,
         animal_name: DEFAULT_STATE.animalName,
         animal_type: DEFAULT_STATE.animalImagePath,
