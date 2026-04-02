@@ -41,11 +41,17 @@ function AuthModal() {
   };
 
   return (
-    <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+    <div
+      className="app-container"
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+      }}
+    >
       <div className="modal" style={{ position: 'static', width: '100%', maxWidth: '360px' }}>
-        <h2 className="modal-header">
-          {mode === 'login' ? 'Welcome Back' : 'Create Account'}
-        </h2>
+        <h2 className="modal-header">{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
 
         <label className="input-label">Email</label>
         <input
@@ -75,7 +81,9 @@ function AuthModal() {
           </div>
         )}
         {message && (
-          <div style={{ color: 'green', fontSize: '14px', marginBottom: '8px', textAlign: 'center' }}>
+          <div
+            style={{ color: 'green', fontSize: '14px', marginBottom: '8px', textAlign: 'center' }}
+          >
             {message}
           </div>
         )}
@@ -91,8 +99,19 @@ function AuthModal() {
 
         <button
           className="button"
-          onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setMessage(''); }}
-          style={{ marginTop: '8px', background: 'transparent', color: 'var(--color-text, #333)', textDecoration: 'underline', border: 'none', boxShadow: 'none' }}
+          onClick={() => {
+            setMode(mode === 'login' ? 'signup' : 'login');
+            setError('');
+            setMessage('');
+          }}
+          style={{
+            marginTop: '8px',
+            background: 'transparent',
+            color: 'var(--color-text, #333)',
+            textDecoration: 'underline',
+            border: 'none',
+            boxShadow: 'none',
+          }}
         >
           {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
         </button>

@@ -65,7 +65,10 @@ const DEFAULT_STATE = {
 // Helper: get current authenticated user (throws if not logged in)
 // -----------------------------------------------------------------------
 async function getCurrentUserId() {
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   if (error || !user) throw new Error('User not authenticated');
   return user.id;
 }
@@ -164,8 +167,7 @@ class PetService {
     const state = await this.getPetState();
     const today = new Date().toISOString().split('T')[0];
     const goalCompleted =
-      state.todayFocused + minutes >= state.focusGoal &&
-      state.todayFocused < state.focusGoal;
+      state.todayFocused + minutes >= state.focusGoal && state.todayFocused < state.focusGoal;
 
     const newState = {
       ...state,

@@ -94,7 +94,7 @@ function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout 
           background: 'transparent',
           border: 'none',
           color: 'var(--color-text, #888)',
-          fontSize: '13px',
+          fontSize: '14px',
           cursor: 'pointer',
           textDecoration: 'underline',
         }}

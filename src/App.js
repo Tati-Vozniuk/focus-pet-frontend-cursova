@@ -20,8 +20,14 @@ function App() {
   const [popupMessage, setPopupMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
-  const showError = (message) => { setPopupMessage(message); setShowPopup(true); };
-  const showSuccess = (message) => { setPopupMessage(message); setShowPopup(true); };
+  const showError = (message) => {
+    setPopupMessage(message);
+    setShowPopup(true);
+  };
+  const showSuccess = (message) => {
+    setPopupMessage(message);
+    setShowPopup(true);
+  };
 
   // ---- Auth state listener -------------------------------------------
   useEffect(() => {
@@ -31,7 +37,9 @@ function App() {
     });
 
     // Listen for login / logout
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (!session) {
         // User logged out — clear pet data
@@ -93,7 +101,15 @@ function App() {
   // Still determining auth state
   if (session === undefined) {
     return (
-      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <div
+        className="app-container"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
         <p>Loading...</p>
       </div>
     );
@@ -107,7 +123,15 @@ function App() {
   // Logged in but pet data still loading
   if (loading) {
     return (
-      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <div
+        className="app-container"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
         <p>Loading...</p>
       </div>
     );

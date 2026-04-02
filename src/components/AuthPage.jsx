@@ -63,13 +63,21 @@ function AuthPage({ onAuthSuccess }) {
         <div className="auth-toggle">
           <button
             className={`auth-toggle-btn ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => { setMode('login'); setError(''); setSuccessMessage(''); }}
+            onClick={() => {
+              setMode('login');
+              setError('');
+              setSuccessMessage('');
+            }}
           >
             Log In
           </button>
           <button
             className={`auth-toggle-btn ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => { setMode('register'); setError(''); setSuccessMessage(''); }}
+            onClick={() => {
+              setMode('register');
+              setError('');
+              setSuccessMessage('');
+            }}
           >
             Sign Up
           </button>
@@ -100,11 +108,7 @@ function AuthPage({ onAuthSuccess }) {
         {error && <div className="auth-error">{error}</div>}
         {successMessage && <div className="auth-success">{successMessage}</div>}
 
-        <button
-          className="button auth-submit-btn"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
+        <button className="button auth-submit-btn" onClick={handleSubmit} disabled={loading}>
           {loading ? '...' : mode === 'login' ? 'Log In' : 'Sign Up'}
         </button>
       </div>
