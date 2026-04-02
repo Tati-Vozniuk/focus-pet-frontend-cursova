@@ -87,18 +87,7 @@ function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout 
         </button>
       </div>
 
-      <button
-        onClick={onLogout}
-        style={{
-          marginTop: '16px',
-          background: 'transparent',
-          border: 'none',
-          color: 'var(--color-text, #888)',
-          fontSize: '14px',
-          cursor: 'pointer',
-          textDecoration: 'underline',
-        }}
-      >
+      <button onClick={onLogout} className="logout-button">
         Log out
       </button>
     </div>

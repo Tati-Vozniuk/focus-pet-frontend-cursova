@@ -371,116 +371,115 @@ body {
   background: #a66c4a;
 }
 
-/* -----------------------------------------------------------------------
-   Додай ці стилі в кінець свого App.css
-   ----------------------------------------------------------------------- */
-
 /* Auth Page */
-.auth-page {
+
+.logout-button {
+  margin-top: 16px;
+  background: transparent;
+  border: none;
+  color: var(--color-text, #888);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ── Wrapper ── */
+.auth-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  width: 100%;
+  min-height: 100px;
 }
 
-.auth-card {
-  background-color: #fff2ea;
-  width: 393px;
-  padding: 40px 20px;
+/* ── Modal card ── */
+.auth-modal {
+  position: static;
+  width: 100%;
+  max-width: 360px;
+  padding: 32px 28px;
+  box-sizing: border-box;
+
+  /* inherit existing .modal styles — add extras here if needed */
+}
+
+/* ── Title ── */
+.auth-title {
+  /* keep existing .modal-header styles */
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 38px;
+}
+
+/* ── Field group (label + input together) ── */
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.auth-field .input-label {
+  /* keep existing .input-label styles */
+  margin-bottom: 0; /* reset if .input-label has its own bottom margin */
+}
+
+.auth-field .input-field {
+  /* keep existing .input-field styles */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Error message ── */
+.auth-error {
+  /* keep existing .validation-error styles */
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border-radius: 4px;
+
+  /* override: make sure it doesn't overflow into other elements */
+  display: block;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ── Success message ── */
+.auth-message {
+  color: green;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* ── Buttons container ── */
+.auth-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  margin-top: 8px;
 }
 
-.auth-pet-emoji {
-  font-size: 64px;
-  line-height: 1;
-  margin-bottom: 4px;
+/* ── Primary submit button ── */
+.auth-submit {
+  width: 100%;
+  /* inherits .button .save-button styles */
 }
 
-.auth-title {
-  font-size: 40px;
-  font-weight: bold;
-  color: black;
-  text-align: center;
-  margin: 0;
-}
-
-.auth-subtitle {
-  font-size: 20px;
-  font-weight: 300;
-  color: #585858;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-/* Toggle Login / Sign Up */
-.auth-toggle {
-  display: flex;
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 9px;
-  overflow: hidden;
-  width: 301px;
-  height: 44px;
-  margin-bottom: 8px;
-}
-
-.auth-toggle-btn {
-  flex: 1;
+/* ── Switch mode link-style button ── */
+.auth-switch {
   background: transparent;
   border: none;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 18px;
-  font-weight: bold;
-  color: #a0a0a0;
+  box-shadow: none;
+  padding: 0;
+  color: var(--color-text, #333);
+  font-size: 14px;
+  text-decoration: underline;
   cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-
-.auth-toggle-btn.active {
-  background-color: #ce9e7a;
-  color: black;
-}
-
-.auth-toggle-btn:first-child {
-  border-right: 2px solid black;
-}
-
-/* Labels */
-.auth-label {
-  font-size: 22px;
-  font-weight: bold;
-  color: black;
-  align-self: flex-start;
-  margin-left: 46px;
-}
-
-/* Error / Success */
-.auth-error {
-  color: #ff3b30;
-  font-size: 15px;
-  font-weight: 300;
   text-align: center;
-  width: 301px;
 }
 
-.auth-success {
-  color: #34c759;
-  font-size: 15px;
-  font-weight: 300;
-  text-align: center;
-  width: 301px;
-}
-
-/* Submit button */
-.auth-submit-btn {
-  width: 301px;
-  height: 50px;
-  margin-top: 8px;
-  font-size: 22px;
+.auth-switch:hover {
+  opacity: 0.7;
 }
