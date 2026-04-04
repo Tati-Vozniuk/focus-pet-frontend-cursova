@@ -67,7 +67,7 @@ function FeedModal({ petState, onClose, refreshPetState, onError }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay">
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-header">Feed Your Pet</h2>
 

@@ -124,7 +124,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay">
       <div className="modal focus-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-header">Time To Focus</h2>
 
@@ -151,6 +151,11 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
         <button className="button focus-modal-button" onClick={handleReset}>
           Reset
         </button>
+
+        <button className="button focus-modal-button" onClick={handleClose}>
+          Close
+        </button>
+        
       </div>
     </div>
   );
