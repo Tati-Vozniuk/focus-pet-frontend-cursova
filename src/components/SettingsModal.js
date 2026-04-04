@@ -90,10 +90,14 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     setSaving(true);
     try {
       const changes = {};
-      if (username !== petState.username) changes.username = { from: petState.username, to: username };
-      if (animalName !== petState.animalName) changes.animalName = { from: petState.animalName, to: animalName };
-      if (parseInt(focusGoal) !== petState.focusGoal) changes.focusGoal = { from: petState.focusGoal, to: parseInt(focusGoal) };
-      if (selectedAnimal !== petState.animalImagePath) changes.animalType = { from: petState.animalImagePath, to: selectedAnimal };
+      if (username !== petState.username)
+        changes.username = { from: petState.username, to: username };
+      if (animalName !== petState.animalName)
+        changes.animalName = { from: petState.animalName, to: animalName };
+      if (parseInt(focusGoal) !== petState.focusGoal)
+        changes.focusGoal = { from: petState.focusGoal, to: parseInt(focusGoal) };
+      if (selectedAnimal !== petState.animalImagePath)
+        changes.animalType = { from: petState.animalImagePath, to: selectedAnimal };
 
       await PetService.updateSettings({
         username: username.trim(),
@@ -145,7 +149,11 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
 
         <img src={getAnimalImage(selectedAnimal)} alt="Pet" className="pet-image" />
 
-        <select className="animal-selector" value={getCurrentAnimalName()} onChange={handleAnimalChange}>
+        <select
+          className="animal-selector"
+          value={getCurrentAnimalName()}
+          onChange={handleAnimalChange}
+        >
           <option>Bear</option>
           <option>Cat</option>
           <option>Bunny</option>
@@ -157,7 +165,10 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="single word only"
           value={username}
-          onChange={(e) => { setUsername(e.target.value); validateUsername(e.target.value); }}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            validateUsername(e.target.value);
+          }}
         />
         {usernameError && <div className="validation-error">{usernameError}</div>}
 
@@ -167,7 +178,10 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="single word only"
           value={animalName}
-          onChange={(e) => { setAnimalName(e.target.value); validateAnimalName(e.target.value); }}
+          onChange={(e) => {
+            setAnimalName(e.target.value);
+            validateAnimalName(e.target.value);
+          }}
         />
         {animalNameError && <div className="validation-error">{animalNameError}</div>}
 
@@ -177,7 +191,10 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
           className="input-field"
           placeholder="numbers only"
           value={focusGoal}
-          onChange={(e) => { setFocusGoal(e.target.value); validateGoal(e.target.value); }}
+          onChange={(e) => {
+            setFocusGoal(e.target.value);
+            validateGoal(e.target.value);
+          }}
         />
         {goalError && <div className="validation-error">{goalError}</div>}
 

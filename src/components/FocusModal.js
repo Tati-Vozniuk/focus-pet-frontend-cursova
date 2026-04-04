@@ -155,7 +155,6 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
         <button className="button focus-modal-button" onClick={handleClose}>
           Close
         </button>
-        
       </div>
     </div>
   );
