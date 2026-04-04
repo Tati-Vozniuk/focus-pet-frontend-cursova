@@ -11,7 +11,7 @@ import analytics from './services/analytics';
 import supabase from './services/supabaseClient';
 
 function App() {
-  const [session, setSession] = useState(undefined); // undefined = loading, null = logged out
+  const [session, setSession] = useState(undefined);
   const [petState, setPetState] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFeedModal, setShowFeedModal] = useState(false);
@@ -29,20 +29,19 @@ function App() {
     setShowPopup(true);
   };
 
-  // ---- Auth state listener -------------------------------------------
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // Listen for login / logout
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (!session) {
-        // User logged out — clear pet data
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') return;
+
+      if (event === 'SIGNED_OUT') {
+        PetService.clearCache();
+        setSession(null);
         setPetState(null);
         setLoading(false);
       }
@@ -51,10 +50,9 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ---- Fetch pet state once session is ready -------------------------
-  const fetchPetState = useCallback(async () => {
+  const fetchPetState = useCallback(async (showLoader = false) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
       const data = await PetService.getPetState();
       setPetState(data);
 
@@ -69,7 +67,7 @@ function App() {
       console.error('Error fetching pet state:', error);
       showError('Failed to load pet data. Please refresh the page.');
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   }, []);
 
@@ -81,10 +79,9 @@ function App() {
     });
   }, []);
 
-  // Fetch pet data when session becomes available
   useEffect(() => {
     if (session) {
-      fetchPetState();
+      fetchPetState(true);
     }
   }, [session, fetchPetState]);
 
@@ -98,7 +95,6 @@ function App() {
     analytics.reset();
   };
 
-  // Still determining auth state
   if (session === undefined) {
     return (
       <div
@@ -115,12 +111,10 @@ function App() {
     );
   }
 
-  // Not logged in — show auth screen
   if (!session) {
     return <AuthModal />;
   }
 
-  // Logged in but pet data still loading
   if (loading) {
     return (
       <div

@@ -6,6 +6,7 @@
 import supabase from './supabaseClient';
 
 let _cachedState = null;
+let _cachedUserId = null;
 
 // -----------------------------------------------------------------------
 // Маппінг: колонки БД → поля React-стану і назад
@@ -65,12 +66,14 @@ const DEFAULT_STATE = {
 // Helper: get current authenticated user (throws if not logged in)
 // -----------------------------------------------------------------------
 async function getCurrentUserId() {
+  if (_cachedUserId) return _cachedUserId;
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser();
   if (error || !user) throw new Error('User not authenticated');
-  return user.id;
+  _cachedUserId = user.id;
+  return _cachedUserId;
 }
 
 // -----------------------------------------------------------------------
@@ -227,12 +230,18 @@ class PetService {
   }
 
   // ---- Скинути всі дані (dev/debug) -----------------------------------
+  static clearCache() {
+    _cachedState = null;
+    _cachedUserId = null;
+  }
+
   static async resetAllData() {
     const state = await this.getPetState();
     if (!state.id) return DEFAULT_STATE;
 
     await supabase.from('pet_state').delete().eq('id', state.id);
     _cachedState = null;
+    _cachedUserId = null;
     const userId = await getCurrentUserId();
     return await this._createInitialState(userId);
   }

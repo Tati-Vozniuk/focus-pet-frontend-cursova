@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import PetService from '../services/petService';
 import analytics from '../services/analytics';
 
@@ -8,6 +8,10 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   const [remainingTime, setRemainingTime] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState(null);
+
+  // Зберігаємо точний час завершення — не залежить від throttling вкладки
+  const endTimeRef = useRef(null);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     analytics.capture('focus_modal_opened', {
@@ -20,6 +24,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   const handleComplete = useCallback(async () => {
     if (completed) return;
 
+    clearInterval(intervalRef.current);
     setTimerRunning(false);
     setCompleted(true);
 
@@ -48,20 +53,31 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
     }
   }, [sliderValue, refreshPetState, onComplete, completed, startTime, petState]);
 
+  // Запускаємо інтервал окремо, щоб handleComplete не потрапляв у залежності
   useEffect(() => {
-    let interval;
-    if (timerRunning && remainingTime > 0) {
-      interval = setInterval(() => {
-        setRemainingTime((prev) => (prev <= 1 ? 0 : prev - 1));
-      }, 1000);
-    } else if (timerRunning && remainingTime === 0) {
-      handleComplete();
-    }
-    return () => clearInterval(interval);
-  }, [timerRunning, remainingTime, handleComplete]);
+    if (!timerRunning) return;
+
+    intervalRef.current = setInterval(() => {
+      if (!endTimeRef.current) return;
+
+      // Рахуємо від поточного часу до endTime — точно навіть після неактивної вкладки
+      const left = Math.max(0, Math.round((endTimeRef.current - Date.now()) / 1000));
+      setRemainingTime(left);
+
+      if (left === 0) {
+        clearInterval(intervalRef.current);
+        handleComplete();
+      }
+    }, 500); // 500ms — подвійна точність, але не навантажує CPU
+
+    return () => clearInterval(intervalRef.current);
+  }, [timerRunning, handleComplete]);
 
   const handleStart = () => {
     if (!timerRunning) {
+      const durationMs = sliderValue * 60 * 1000;
+      endTimeRef.current = Date.now() + durationMs;
+
       setRemainingTime(sliderValue * 60);
       setTimerRunning(true);
       setCompleted(false);
@@ -77,6 +93,9 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   const handleReset = () => {
     const wasRunning = timerRunning;
     const timeElapsed = startTime ? Math.floor((Date.now() - startTime) / 60000) : 0;
+
+    clearInterval(intervalRef.current);
+    endTimeRef.current = null;
 
     setTimerRunning(false);
     setRemainingTime(sliderValue * 60);
@@ -124,7 +143,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   };
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal focus-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-header">Time To Focus</h2>
 
