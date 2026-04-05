@@ -14,8 +14,8 @@ function App() {
   const [session, setSession] = useState(undefined);
   const [petState, setPetState] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState('main'); // 'main' | 'focus'
   const [showFeedModal, setShowFeedModal] = useState(false);
-  const [showFocusModal, setShowFocusModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
@@ -93,7 +93,7 @@ function App() {
   }, [session, fetchPetState]);
 
   const handleFocusComplete = (minutes) => {
-    setShowFocusModal(false);
+    setCurrentPage('main');
     showSuccess(minutes);
   };
 
@@ -104,10 +104,7 @@ function App() {
 
   if (session === undefined) {
     return (
-      <div
-        className="app-container"
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-      >
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <p>Loading...</p>
       </div>
     );
@@ -119,21 +116,41 @@ function App() {
 
   if (loading) {
     return (
-      <div
-        className="app-container"
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-      >
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <p>Loading...</p>
       </div>
     );
   }
 
+  // ── Focus page — повноекранна, без navbar ──
+  if (currentPage === 'focus' && petState) {
+    return (
+      <div className="app-container">
+        <FocusModal
+          petState={petState}
+          onClose={() => setCurrentPage('main')}
+          refreshPetState={fetchPetState}
+          onComplete={handleFocusComplete}
+        />
+
+        {showReward && (
+          <PopupModal
+            isReward
+            rewardAmount={rewardAmount}
+            onClose={() => setShowReward(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // ── Main page ──
   return (
     <div className="app-container">
       <MainView
         petState={petState}
         onOpenFeed={() => setShowFeedModal(true)}
-        onOpenFocus={() => setShowFocusModal(true)}
+        onOpenFocus={() => setCurrentPage('focus')}
         onOpenSettings={() => setShowSettingsModal(true)}
         refreshPetState={fetchPetState}
         onLogout={handleLogout}
@@ -157,15 +174,6 @@ function App() {
         />
       )}
 
-      {showFocusModal && petState && (
-        <FocusModal
-          petState={petState}
-          onClose={() => setShowFocusModal(false)}
-          refreshPetState={fetchPetState}
-          onComplete={handleFocusComplete}
-        />
-      )}
-
       {showSettingsModal && petState && (
         <SettingsModal
           petState={petState}
@@ -175,10 +183,16 @@ function App() {
         />
       )}
 
-      {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
+      {showPopup && (
+        <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />
+      )}
 
       {showReward && (
-        <PopupModal isReward rewardAmount={rewardAmount} onClose={() => setShowReward(false)} />
+        <PopupModal
+          isReward
+          rewardAmount={rewardAmount}
+          onClose={() => setShowReward(false)}
+        />
       )}
     </div>
   );

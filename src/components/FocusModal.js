@@ -9,7 +9,6 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState(null);
 
-  // Precise end-time ref — stays accurate even when tab is throttled
   const endTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -54,7 +53,6 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
     }
   }, [sliderValue, refreshPetState, onComplete, completed, startTime, petState]);
 
-  // Separate interval effect so handleComplete doesn't cause re-subscriptions
   useEffect(() => {
     if (!timerRunning) return;
 
@@ -143,49 +141,26 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   };
 
   return (
-    <div
-      className="app-container"
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        zIndex: 10,
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <div className="background-circle-left circle-one"></div>
       <div className="background-circle-right circle-two"></div>
       <div className="background-circle-right circle-three"></div>
 
       <div className="top-card-section focus-card">
         <button className="back button" onClick={handleClose}>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M19 12H5"
-              stroke="#F06C78"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12 19L5 12L12 5"
-              stroke="#F06C78"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5" stroke="#F06C78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 19L5 12L12 5" stroke="#F06C78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
 
         <h1 className="focus-screen-title">Time to focus</h1>
 
-        <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="focus-pet-image" />
+        <img
+          src={getAnimalImage(petState.animalImagePath)}
+          alt="Pet"
+          className="focus-pet-image"
+        />
 
         <div className="big-timer-display">{formatTime()}</div>
 

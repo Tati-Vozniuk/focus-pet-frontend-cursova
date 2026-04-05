@@ -59,6 +59,7 @@ body {
   border-radius: 30px;
 }
 
+
 /* Background decorative circles */
 .background-circle-left {
   width: 250px;
@@ -403,6 +404,7 @@ body {
   font-weight: var(--fw-black);
   color: var(--color-accent);
   margin-top: 50px;
+  z-index: 10;
 }
 
 .focus-pet-image {
