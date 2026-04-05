@@ -10,13 +10,13 @@ import PetService from './services/petService';
 import analytics from './services/analytics';
 import supabase from './services/supabaseClient';
 
+// currentPage: 'main' | 'focus' | 'feed' | 'settings'
+
 function App() {
   const [session, setSession] = useState(undefined);
   const [petState, setPetState] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState('main'); // 'main' | 'focus'
-  const [showFeedModal, setShowFeedModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState('main');
   const [popupMessage, setPopupMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [rewardAmount, setRewardAmount] = useState(0);
@@ -32,6 +32,7 @@ function App() {
     setShowReward(true);
   };
 
+  // ── Auth ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -57,6 +58,7 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // ── Fetch pet state ───────────────────────────────────────────────────────
   const fetchPetState = useCallback(async (showLoader = false) => {
     try {
       if (showLoader) setLoading(true);
@@ -92,6 +94,7 @@ function App() {
     }
   }, [session, fetchPetState]);
 
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleFocusComplete = (minutes) => {
     setCurrentPage('main');
     showSuccess(minutes);
@@ -102,6 +105,7 @@ function App() {
     analytics.reset();
   };
 
+  // ── Guards ────────────────────────────────────────────────────────────────
   if (session === undefined) {
     return (
       <div
@@ -128,7 +132,7 @@ function App() {
     );
   }
 
-  // ── Focus page — повноекранна, без navbar ──
+  // ── Focus — повноекранна сторінка ─────────────────────────────────────────
   if (currentPage === 'focus' && petState) {
     return (
       <div className="app-container">
@@ -138,7 +142,6 @@ function App() {
           refreshPetState={fetchPetState}
           onComplete={handleFocusComplete}
         />
-
         {showReward && (
           <PopupModal isReward rewardAmount={rewardAmount} onClose={() => setShowReward(false)} />
         )}
@@ -146,14 +149,44 @@ function App() {
     );
   }
 
-  // ── Main page ──
+  // ── Feed — повноекранна сторінка ──────────────────────────────────────────
+  if (currentPage === 'feed' && petState) {
+    return (
+      <div className="app-container">
+        <FeedModal
+          petState={petState}
+          onClose={() => setCurrentPage('main')}
+          refreshPetState={fetchPetState}
+          onError={showError}
+        />
+        {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
+      </div>
+    );
+  }
+
+  // ── Settings — повноекранна сторінка ─────────────────────────────────────
+  if (currentPage === 'settings' && petState) {
+    return (
+      <div className="app-container">
+        <SettingsModal
+          petState={petState}
+          onClose={() => setCurrentPage('main')}
+          refreshPetState={fetchPetState}
+          onError={showError}
+        />
+        {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
+      </div>
+    );
+  }
+
+  // ── Main ──────────────────────────────────────────────────────────────────
   return (
     <div className="app-container">
       <MainView
         petState={petState}
-        onOpenFeed={() => setShowFeedModal(true)}
+        onOpenFeed={() => setCurrentPage('feed')}
         onOpenFocus={() => setCurrentPage('focus')}
-        onOpenSettings={() => setShowSettingsModal(true)}
+        onOpenSettings={() => setCurrentPage('settings')}
         refreshPetState={fetchPetState}
         onLogout={handleLogout}
       />
@@ -162,28 +195,10 @@ function App() {
         <div className="navbar-icon button" onClick={() => window.location.reload()}>
           <img src={`${process.env.PUBLIC_URL}/images/home.svg`} alt="Home" />
         </div>
-        <div className="navbar-icon button" onClick={() => setShowSettingsModal(true)}>
+        <div className="navbar-icon button" onClick={() => setCurrentPage('settings')}>
           <img src={`${process.env.PUBLIC_URL}/images/settings.svg`} alt="Settings" />
         </div>
       </nav>
-
-      {showFeedModal && petState && (
-        <FeedModal
-          petState={petState}
-          onClose={() => setShowFeedModal(false)}
-          refreshPetState={fetchPetState}
-          onError={showError}
-        />
-      )}
-
-      {showSettingsModal && petState && (
-        <SettingsModal
-          petState={petState}
-          onClose={() => setShowSettingsModal(false)}
-          refreshPetState={fetchPetState}
-          onError={showError}
-        />
-      )}
 
       {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
 

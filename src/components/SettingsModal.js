@@ -29,7 +29,6 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     }
   }, [petState]);
 
-  // ── Оригінальна валідація з src ──
   const validateUsername = (value) => {
     if (value && value.includes(' ')) {
       setUsernameError('Must be a single word');
@@ -61,7 +60,6 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     return true;
   };
 
-  // ── Вибір тварини стрілками (новий дизайн) + аналітика (оригінал) ──
   const changeAnimal = (direction) => {
     const currentIndex = animals.findIndex((a) => a.id === selectedAnimal);
     let nextIndex = currentIndex + direction;
@@ -77,7 +75,6 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     }
   };
 
-  // ── Оригінальний handleSave з src ──
   const handleSave = async () => {
     const isUsernameValid = validateUsername(username);
     const isAnimalNameValid = validateAnimalName(animalName);
@@ -149,16 +146,7 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
   };
 
   return (
-    <div
-      className="app-container"
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        zIndex: 10,
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <div className="background-circle-left circle-one"></div>
       <div className="background-circle-right circle-two"></div>
 

@@ -210,5 +210,4 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   );
 }
 
-
 export default FocusModal;

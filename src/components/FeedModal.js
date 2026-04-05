@@ -92,28 +92,13 @@ function FeedModal({ petState, onClose, refreshPetState, onError }) {
   };
 
   return (
-    <div
-      className="app-container"
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        zIndex: 10,
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <div className="background-circle-left circle-one"></div>
       <div className="background-circle-right circle-two"></div>
 
       <div className="top-card-section feed-top-card">
         <button className="back button" onClick={onClose}>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M19 12H5"
               stroke="#F06C78"
