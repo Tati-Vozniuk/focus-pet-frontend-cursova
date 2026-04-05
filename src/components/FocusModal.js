@@ -9,7 +9,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState(null);
 
-  // Зберігаємо точний час завершення — не залежить від throttling вкладки
+  // Precise end-time ref — stays accurate even when tab is throttled
   const endTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -50,17 +50,17 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
         error: error.message,
         plannedMinutes: sliderValue,
       });
+      onComplete(sliderValue);
     }
   }, [sliderValue, refreshPetState, onComplete, completed, startTime, petState]);
 
-  // Запускаємо інтервал окремо, щоб handleComplete не потрапляв у залежності
+  // Separate interval effect so handleComplete doesn't cause re-subscriptions
   useEffect(() => {
     if (!timerRunning) return;
 
     intervalRef.current = setInterval(() => {
       if (!endTimeRef.current) return;
 
-      // Рахуємо від поточного часу до endTime — точно навіть після неактивної вкладки
       const left = Math.max(0, Math.round((endTimeRef.current - Date.now()) / 1000));
       setRemainingTime(left);
 
@@ -68,7 +68,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
         clearInterval(intervalRef.current);
         handleComplete();
       }
-    }, 500); // 500ms — подвійна точність, але не навантажує CPU
+    }, 500);
 
     return () => clearInterval(intervalRef.current);
   }, [timerRunning, handleComplete]);
@@ -98,7 +98,7 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
     endTimeRef.current = null;
 
     setTimerRunning(false);
-    setRemainingTime(sliderValue * 60);
+    setRemainingTime(0);
     setCompleted(false);
     setStartTime(null);
 
@@ -139,40 +139,82 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
       'cat_img.png': '/images/cat.png',
       'bunny_img.png': '/images/bunny.png',
     };
-    return imageMap[imagePath] || '/images/bear.png';
+    return `${process.env.PUBLIC_URL}${imageMap[imagePath] || '/images/bear.png'}`;
   };
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal focus-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-header">Time To Focus</h2>
+    <div
+      className="app-container"
+      style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        zIndex: 10,
+      }}
+    >
+      <div className="background-circle-left circle-one"></div>
+      <div className="background-circle-right circle-two"></div>
+      <div className="background-circle-right circle-three"></div>
 
-        <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="pet-image" />
+      <div className="top-card-section focus-card">
+        <button className="back button" onClick={handleClose}>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 12H5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M12 19L5 12L12 5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
 
-        <div className="timer-display">{formatTime()}</div>
+        <h1 className="focus-screen-title">Time to focus</h1>
 
-        <div className="slider-container">
+        <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="focus-pet-image" />
+
+        <div className="big-timer-display">{formatTime()}</div>
+
+        <div className="focus-slider-container">
           <input
             type="range"
-            min="0"
+            min="1"
             max="120"
+            step="1"
             value={sliderValue}
             onChange={(e) => setSliderValue(Number(e.target.value))}
-            className="slider"
+            className="focus-slider-input"
             disabled={timerRunning}
           />
         </div>
+      </div>
 
-        <button className="button focus-modal-button" onClick={handleStart} disabled={timerRunning}>
-          Focus
+      <div className="focus-controls-footer">
+        <button
+          className="main-focus button"
+          style={{ width: 160, height: 160 }}
+          onClick={handleStart}
+          disabled={timerRunning}
+        >
+          {timerRunning ? 'Running' : 'Focus'}
         </button>
 
-        <button className="button focus-modal-button" onClick={handleReset}>
+        <button className="reset-text-button" onClick={handleReset}>
           Reset
-        </button>
-
-        <button className="button focus-modal-button" onClick={handleClose}>
-          Close
         </button>
       </div>
     </div>

@@ -13,6 +13,12 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
   const [animalNameError, setAnimalNameError] = useState('');
   const [goalError, setGoalError] = useState('');
 
+  const animals = [
+    { id: 'bear_img.png', name: 'Bear' },
+    { id: 'cat_img.png', name: 'Cat' },
+    { id: 'bunny_img.png', name: 'Bunny' },
+  ];
+
   useEffect(() => {
     analytics.capture('settings_opened');
     if (petState) {
@@ -23,6 +29,7 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     }
   }, [petState]);
 
+  // ── Оригінальна валідація з src ──
   const validateUsername = (value) => {
     if (value && value.includes(' ')) {
       setUsernameError('Must be a single word');
@@ -54,19 +61,23 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
     return true;
   };
 
-  const handleAnimalChange = (e) => {
-    const animalMap = { Bear: 'bear_img.png', Cat: 'cat_img.png', Bunny: 'bunny_img.png' };
-    const newAnimalPath = animalMap[e.target.value];
-    setSelectedAnimal(newAnimalPath);
-
-    if (newAnimalPath !== petState.animalImagePath) {
+  // ── Вибір тварини стрілками (новий дизайн) + аналітика (оригінал) ──
+  const changeAnimal = (direction) => {
+    const currentIndex = animals.findIndex((a) => a.id === selectedAnimal);
+    let nextIndex = currentIndex + direction;
+    if (nextIndex < 0) nextIndex = animals.length - 1;
+    if (nextIndex >= animals.length) nextIndex = 0;
+    const next = animals[nextIndex];
+    setSelectedAnimal(next.id);
+    if (next.id !== petState.animalImagePath) {
       analytics.capture('animal_changed', {
         from: petState.animalImagePath,
-        to: newAnimalPath,
+        to: next.id,
       });
     }
   };
 
+  // ── Оригінальний handleSave з src ──
   const handleSave = async () => {
     const isUsernameValid = validateUsername(username);
     const isAnimalNameValid = validateAnimalName(animalName);
@@ -134,76 +145,123 @@ function SettingsModal({ petState, onClose, refreshPetState, onError }) {
       'cat_img.png': '/images/cat.png',
       'bunny_img.png': '/images/bunny.png',
     };
-    return imageMap[imagePath] || '/images/bear.png';
-  };
-
-  const getCurrentAnimalName = () => {
-    const nameMap = { 'bear_img.png': 'Bear', 'cat_img.png': 'Cat', 'bunny_img.png': 'Bunny' };
-    return nameMap[selectedAnimal] || 'Bear';
+    return `${process.env.PUBLIC_URL}${imageMap[imagePath] || '/images/bear.png'}`;
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal settings-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-header">Settings</h2>
+    <div
+      className="app-container"
+      style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        zIndex: 10,
+      }}
+    >
+      <div className="background-circle-left circle-one"></div>
+      <div className="background-circle-right circle-two"></div>
 
-        <img src={getAnimalImage(selectedAnimal)} alt="Pet" className="pet-image" />
-
-        <select
-          className="animal-selector"
-          value={getCurrentAnimalName()}
-          onChange={handleAnimalChange}
-        >
-          <option>Bear</option>
-          <option>Cat</option>
-          <option>Bunny</option>
-        </select>
-
-        <label className="input-label">Your name</label>
-        <input
-          type="text"
-          className="input-field"
-          placeholder="single word only"
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-            validateUsername(e.target.value);
-          }}
-        />
-        {usernameError && <div className="validation-error">{usernameError}</div>}
-
-        <label className="input-label">Animal name</label>
-        <input
-          type="text"
-          className="input-field"
-          placeholder="single word only"
-          value={animalName}
-          onChange={(e) => {
-            setAnimalName(e.target.value);
-            validateAnimalName(e.target.value);
-          }}
-        />
-        {animalNameError && <div className="validation-error">{animalNameError}</div>}
-
-        <label className="input-label">Daily focus goal (min)</label>
-        <input
-          type="text"
-          className="input-field"
-          placeholder="numbers only"
-          value={focusGoal}
-          onChange={(e) => {
-            setFocusGoal(e.target.value);
-            validateGoal(e.target.value);
-          }}
-        />
-        {goalError && <div className="validation-error">{goalError}</div>}
-
-        <button className="button save-button" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving...' : 'Save'}
+      <div className="top-card-section">
+        <button className="back button" onClick={onClose}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M19 12H5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M12 19L5 12L12 5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
 
-        <button className="button" onClick={onClose} disabled={saving}>
-          Close
+        <h1 className="settings-title">Settings</h1>
+
+        <div className="animal-selection-container">
+          <button className="arrow-btn" onClick={() => changeAnimal(-1)}>
+            <svg width="24" height="40" viewBox="0 0 24 40" fill="none">
+              <path
+                d="M20 36L4 20L20 4"
+                stroke="#F06C78"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <img src={getAnimalImage(selectedAnimal)} alt="Pet" className="settings-pet-image" />
+          <button className="arrow-btn" onClick={() => changeAnimal(1)}>
+            <svg width="24" height="40" viewBox="0 0 24 40" fill="none">
+              <path
+                d="M4 4L20 20L4 36"
+                stroke="#F06C78"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="animal-type-badge">
+          {animals.find((a) => a.id === selectedAnimal)?.name}
+        </div>
+      </div>
+
+      <div className="settings-form">
+        <div className="input-block">
+          <div className="input-group">
+            <label>Your name</label>
+            <input
+              type="text"
+              value={username}
+              placeholder="single word only"
+              onChange={(e) => {
+                setUsername(e.target.value);
+                validateUsername(e.target.value);
+              }}
+            />
+            {usernameError && <div className="validation-error">{usernameError}</div>}
+          </div>
+
+          <div className="input-group">
+            <label>Animal name</label>
+            <input
+              type="text"
+              value={animalName}
+              placeholder="single word only"
+              onChange={(e) => {
+                setAnimalName(e.target.value);
+                validateAnimalName(e.target.value);
+              }}
+            />
+            {animalNameError && <div className="validation-error">{animalNameError}</div>}
+          </div>
+
+          <div className="input-group">
+            <label>Daily focus goal (min)</label>
+            <input
+              type="text"
+              value={focusGoal}
+              placeholder="numbers only"
+              onChange={(e) => {
+                setFocusGoal(e.target.value);
+                validateGoal(e.target.value);
+              }}
+            />
+            {goalError && <div className="validation-error">{goalError}</div>}
+          </div>
+        </div>
+
+        <button className="save-action button" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save'}
         </button>
       </div>
     </div>

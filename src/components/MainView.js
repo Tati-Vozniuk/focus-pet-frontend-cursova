@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PetService from '../services/petService';
 
-function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout }) {
+function MainView({ petState, onOpenFeed, onOpenFocus, onLogout }) {
   const [hungerTime, setHungerTime] = useState({ hours: 0, minutes: 0 });
   const [remainingFocus, setRemainingFocus] = useState(0);
 
@@ -23,12 +23,10 @@ function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout 
     if (petState) {
       updateHungerTime();
       updateRemainingFocus();
-
       const interval = setInterval(() => {
         updateHungerTime();
         updateRemainingFocus();
       }, 5000);
-
       return () => clearInterval(interval);
     }
   }, [petState, updateHungerTime, updateRemainingFocus]);
@@ -39,57 +37,79 @@ function MainView({ petState, onOpenFeed, onOpenFocus, onOpenSettings, onLogout 
       'cat_img.png': '/images/cat.png',
       'bunny_img.png': '/images/bunny.png',
     };
-    return imageMap[imagePath] || '/images/bear.png';
+    return `${process.env.PUBLIC_URL}${imageMap[imagePath] || '/images/bear.png'}`;
   };
 
   if (!petState) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        className="app-container"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (
-    <div className="main-view">
-      <h1 className="greeting-text">Hi, {petState.username}</h1>
-      <p className="subtitle-text">{petState.animalName} missed you</p>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div className="background-circle-left circle-one"></div>
+      <div className="background-circle-right circle-two"></div>
 
-      <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="pet-image" />
-
-      <button className="button feed-button" onClick={onOpenFeed}>
-        Feed
-      </button>
-
-      <p className="goal-text">Your daily goal is {petState.focusGoal} min</p>
-      <p className="goal-text">Time left {remainingFocus} min</p>
-
-      <div className="info-container">
-        <div className="info-box">
-          <div className="info-number">{petState.totalTime}</div>
-          <div className="info-label">total min</div>
+      {/* Top card */}
+      <div className="top-card-section">
+        <div className="coin-display-badge">
+          <span>{petState.totalMoney}</span>
+          <img className="coin-icon" src={`${process.env.PUBLIC_URL}/images/coin.png`} alt="Coin" />
         </div>
-        <div className="info-box">
-          <div className="info-number">{petState.totalTimesAte}</div>
-          <div className="info-label">times ate</div>
-        </div>
+        <h1 className="pet-name-title">{petState.animalName}</h1>
+        <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="pet-main-image" />
       </div>
 
-      <div className="hunger-box">
-        <div className="info-number">
-          {hungerTime.hours}h {hungerTime.minutes}m
-        </div>
-        <div className="info-label">will be hungry in</div>
-      </div>
-
-      <div className="button-container">
-        <button className="button focus-button" onClick={onOpenFocus}>
-          Focus now
-        </button>
-        <button className="button settings-button" onClick={onOpenSettings}>
-          <span className="settings-icon">⚙️</span>
+      {/* Focus button (overlapping) */}
+      <div className="focus-button-wrapper">
+        <button className="main-focus button" onClick={onOpenFocus}>
+          Focus
+          <br />
+          now
         </button>
       </div>
 
-      <button onClick={onLogout} className="logout-button">
-        Log out
-      </button>
+      {/* Bottom section */}
+      <div className="bottom-content-section">
+        <p className="status-text">Hi, {petState.username}!</p>
+        <p className="status-text">
+          Daily goal: <span className="status-text-bold">{petState.focusGoal} min</span>
+        </p>
+        <p className="status-text">
+          Time left: <span className="status-text-bold">{remainingFocus} min</span>
+        </p>
+        <p className="status-text">
+          Hungry in:{' '}
+          <span className="status-text-bold">
+            {hungerTime.hours}h {hungerTime.minutes}m
+          </span>
+        </p>
+
+        <div className="stats-row">
+          <div className="stat-box">
+            <div className="stat-number">{petState.totalTime}</div>
+            <div className="stat-label">total min</div>
+          </div>
+          <div className="stat-box">
+            <div className="stat-number">{petState.totalTimesAte}</div>
+            <div className="stat-label">times ate</div>
+          </div>
+        </div>
+
+        <button className="feed-action button" onClick={onOpenFeed}>
+          Feed {petState.animalName}
+        </button>
+
+        <button onClick={onLogout} className="logout-button">
+          Log out
+        </button>
+      </div>
     </div>
   );
 }

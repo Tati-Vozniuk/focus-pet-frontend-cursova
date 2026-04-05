@@ -1,486 +1,825 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+:root {
+  --color-primary: #f6e7b8;
+  --color-accent: #e24b5a;
+  --color-secondary: #f9c3cb;
+  --color-text-span: #7f2203;
+  --color-button: #f06c78;
+
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+  --fw-black: 900;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+.button {
+  transition: transform 0.1s;
+  cursor: pointer;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #fff2ea;
+  font-family: 'Nunito', sans-serif;
+  background-color: #333;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 5px;
 }
 
 .app-container {
-  width: 393px;
-  background-color: #fff2ea;
-  padding: 5px;
+  width: 390px;
+  min-height: 844px;
   position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-primary);
+  border-radius: 30px;
 }
 
-/* Main View Styles */
-.main-view {
+/* Background decorative circles */
+.background-circle-left {
+  width: 250px;
+  height: 250px;
+  position: absolute;
+  z-index: 2;
+  background: radial-gradient(
+    circle at center,
+    rgba(240, 108, 120, 1) 20%,
+    rgba(240, 108, 120, 0.75) 50%,
+    rgba(240, 108, 120, 0.5) 75%,
+    rgba(240, 108, 120, 0.25) 88%,
+    rgba(240, 108, 120, 0) 100%
+  );
+  filter: blur(50px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.background-circle-right {
+  width: 250px;
+  height: 250px;
+  position: absolute;
+  z-index: 2;
+  background: radial-gradient(
+    circle at center,
+    rgba(246, 231, 184, 1) 20%,
+    rgba(246, 231, 184, 0.75) 50%,
+    rgba(246, 231, 184, 0.5) 75%,
+    rgba(246, 231, 184, 0.25) 88%,
+    rgba(246, 231, 184, 0) 100%
+  );
+  filter: blur(50px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.circle-one {
+  top: 150px;
+  left: -125px;
+}
+.circle-two {
+  top: -70px;
+  right: -70px;
+}
+.circle-three {
+  top: 444px;
+  right: -125px;
+}
+.circle-four {
+  top: 664px;
+  left: -70px;
+}
+
+/* ── Top card ── */
+.top-card-section {
+  height: 400px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  background: var(--color-secondary);
+  border-radius: 30px;
 }
 
-.greeting-text {
-  font-size: 30px;
-  font-weight: 300;
-  color: black;
+.pet-name-title {
+  font-size: 40px;
+  font-weight: var(--fw-black);
+  color: var(--color-accent);
   text-align: center;
-  margin-top: 10px;
+  z-index: 3;
 }
 
-.subtitle-text {
-  font-size: 22px;
-  font-weight: 300;
-  color: black;
+.pet-main-image {
+  width: auto;
+  height: 150px;
+  object-fit: contain;
+  margin-top: 20px;
+  z-index: 3;
+}
+
+.coin-display-badge {
+  width: 80px;
+  height: 40px;
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  top: 20px;
+  right: 20px;
+  background-color: var(--color-button);
+  border-radius: 50px;
+  padding: 10px 5px;
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: var(--fw-black);
+}
+
+.coin-icon {
+  width: 26px;
+  height: 26px;
+}
+
+/* ── Focus button (circular, overlapping) ── */
+.focus-button-wrapper {
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  z-index: 10;
+  top: 400px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.focus-controls-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 40px;
+  padding-top: 20px;
+}
+
+.main-focus {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-button);
+  border: 10px solid var(--color-primary);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 25px;
+  font-weight: var(--fw-semibold);
+}
+
+/* ── Bottom content ── */
+.bottom-content-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding-top: 90px;
+  gap: 15px;
+  padding-bottom: 20px;
+}
+
+.status-text {
+  font-size: 20px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent);
   text-align: center;
+}
+
+.status-text-bold {
+  color: var(--color-text-span);
+  font-weight: var(--fw-extrabold);
+}
+
+.feed-action {
+  width: 330px;
+  height: 50px;
+  text-align: center;
+  background-color: var(--color-button);
+  border: none;
+  border-radius: 30px;
+  color: var(--color-primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-weight: var(--fw-black);
   margin-bottom: 10px;
 }
 
-.pet-image {
-  width: 170px;
-  height: 207px;
-  object-fit: contain;
-  margin: 10px 0;
+/* ── Stats row ── */
+.stats-row {
+  display: flex;
+  gap: 15px;
 }
 
-.button {
-  background-color: #ce9e7a;
-  border: 3px solid black;
-  border-radius: 9px;
-  color: black;
-  font-size: 22px;
-  font-weight: bold;
-  font-family: 'Montserrat', sans-serif;
+.stat-box {
+  background-color: var(--color-secondary);
+  border-radius: 20px;
   padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.button:hover {
-  background-color: #a66c4a;
-}
-
-.button:disabled {
-  background-color: #ce9e7a;
-  color: #a66c4a;
-  cursor: not-allowed;
-}
-
-.feed-button {
-  width: 170px;
-  height: 44px;
-}
-
-.goal-text {
-  font-size: 22px;
-  font-weight: 300;
-  color: black;
-  text-align: center;
-  margin: 5px 0;
-}
-
-.info-container {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.info-box {
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 9px;
-  width: 138px;
-  height: 61px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 5px;
 }
 
-.info-number {
+.stat-number {
   font-size: 22px;
-  font-weight: bold;
-  color: black;
+  font-weight: var(--fw-black);
+  color: var(--color-text-span);
 }
 
-.info-label {
-  font-size: 18px;
-  color: #585858;
+.stat-label {
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent);
 }
 
-.hunger-box {
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 9px;
-  width: 280px;
-  height: 61px;
+/* ── Bottom navbar ── */
+.bottom-navbar {
+  height: 70px;
+  flex-shrink: 0;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  padding: 5px;
-  margin: 10px 0;
+  background-color: var(--color-secondary);
+  padding: 0 70px;
 }
 
-.button-container {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.focus-button {
-  width: 226px;
-  height: 65px;
-}
-
-.settings-button {
-  width: 65px;
-  height: 65px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.settings-icon {
-  width: 30px;
+.navbar-icon {
   height: 30px;
+  width: 30px;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+/* ── Logout link ── */
+.logout-button {
+  background: transparent;
+  border: none;
+  color: var(--color-accent);
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-bottom: 10px;
+}
+
+/* ── Back button (inside full-screen modals) ── */
+.back {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 50%;
 }
 
-.modal {
-  background-color: #fff2ea;
-  border-radius: 9px;
-  padding: 20px;
-  padding-bottom: 30px;
-  max-width: 393px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
+/* ════════════════════════════════════════
+   FEED MODAL
+════════════════════════════════════════ */
+.feed-top-card {
+  justify-content: flex-start;
+  padding-top: 20px;
+  gap: 10px;
 }
 
-.modal-header {
-  font-size: 35px;
-  font-weight: bold;
-  color: black;
-  text-align: center;
+.feed-coin-badge {
+  position: static;
+  margin: 10px auto 0;
+}
+
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  width: 100%;
   margin-bottom: 20px;
 }
 
-/* Feed Modal */
-.money-display {
-  background-color: #ce9e7a;
-  border: 3px solid black;
-  border-radius: 9px;
-  padding: 10px 20px;
-  font-size: 22px;
-  font-weight: bold;
-  color: black;
-  text-align: center;
-  margin: 20px auto;
-  width: fit-content;
-}
-
-.feed-modal-button {
-  width: 301px;
-  height: 44px;
-  margin: 10px auto;
-  display: block;
-}
-
-/* Focus Modal */
-.focus-modal {
+.food-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
-.timer-display {
-  font-size: 49px;
-  color: black;
-  font-weight: normal;
-  margin: 10px 0;
-}
-
-.slider-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-.slider {
-  width: 185px;
-  height: 8px;
-  border-radius: 5px;
-  background: #ce9e7a;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: black;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: black;
-  cursor: pointer;
-  border: none;
-}
-
-.focus-modal-button {
-  width: 170px;
-  height: 44px;
-  margin: 5px;
-}
-
-/* Settings Modal */
-.settings-modal {
+.food-item {
+  height: 100px;
+  width: 100px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-secondary);
+  border-radius: 20px;
+  padding: 10px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+
+.food-item:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.food-item.selected {
+  border-color: var(--color-button);
+  background: white;
+}
+
+.food-image-wrapper {
+  max-width: 80px;
+  max-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.food-price-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-accent);
+  padding: 4px 8px;
+  font-size: 20px;
+  font-weight: var(--fw-semibold);
+}
+
+/* ════════════════════════════════════════
+   FOCUS MODAL
+════════════════════════════════════════ */
+.focus-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 25px;
+  padding: 20px 20px 40px;
+  z-index: 3;
+  overflow-y: auto;
+}
+
+.focus-screen-title {
+  font-size: 50px;
+  font-weight: var(--fw-black);
+  color: var(--color-accent);
+  margin-top: 50px;
+}
+
+.focus-pet-image {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.big-timer-display {
+  font-size: 60px;
+  font-weight: var(--fw-black);
+  color: var(--color-text-span);
+}
+
+.focus-slider-container {
+  width: 100%;
+  max-width: 280px;
+}
+
+.focus-slider-input {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  background: var(--color-button);
+  border-radius: 30px;
+  outline: none;
+}
+
+.focus-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.focus-circle-btn {
+  width: 160px;
+  height: 160px;
+  background-color: var(--color-button);
+  border: 10px solid var(--color-secondary);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 25px;
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: transform 0.1s;
+  flex-shrink: 0;
+}
+
+.focus-circle-btn:hover {
+  transform: scale(1.05);
+}
+.focus-circle-btn:active {
+  transform: scale(0.95);
+}
+.focus-circle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reset-text-button {
+  height: 40px;
+  width: 160px;
+  background: var(--color-button);
+  color: var(--color-primary);
+  border: none;
+  border-radius: 30px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-weight: var(--fw-black);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.reset-text-button:hover {
+  transform: scale(1.05);
+}
+.reset-text-button:active {
+  transform: scale(0.95);
+}
+
+/* ════════════════════════════════════════
+   SETTINGS MODAL
+════════════════════════════════════════ */
+.settings-title {
+  z-index: 3;
+  font-size: 40px;
+  font-weight: var(--fw-black);
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.animal-selection-container {
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.settings-pet-image {
+  width: 140px;
+  height: 140px;
+  z-index: 3;
+  object-fit: contain;
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  transition: transform 0.1s;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.1);
+}
+
+.animal-type-badge {
+  height: 50px;
+  width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-button);
+  border-radius: 30px;
+  font-weight: var(--fw-black);
+  font-size: 20px;
+  color: var(--color-primary);
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px 40px;
+  align-items: center;
+  width: 100%;
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.input-group label {
+  font-weight: var(--fw-black);
+  font-size: 24px;
+  color: var(--color-accent);
+}
+
+.input-group input {
+  height: 50px;
+  width: 100%;
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-accent);
+  border-radius: 30px;
+  padding: 12px 20px;
+  font-size: 18px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--color-button);
+  outline: none;
+  text-align: center;
+}
+
+.input-group input::placeholder {
+  color: rgba(240, 108, 120, 0.5);
+}
+
+.validation-error {
+  color: #cc2222;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  text-align: center;
+}
+
+.save-action {
+  height: 50px;
+  width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-button);
+  border: none;
+  border-radius: 30px;
+  font-size: 24px;
+  font-weight: var(--fw-black);
+  font-family: 'Nunito', sans-serif;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ════════════════════════════════════════
+   POPUP MODAL
+════════════════════════════════════════ */
+.popup-overlay {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.popup {
+  width: 390px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  background: var(--color-secondary);
+  border-radius: 30px;
+  font-family: 'Nunito', sans-serif;
+  padding: 40px 20px;
+}
+
+.popup-title {
+  z-index: 21;
+  font-size: 45px;
+  font-weight: var(--fw-black);
+  color: var(--color-accent);
+  text-align: center;
+}
+
+.reward-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.popup-reward-amount {
+  display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.animal-selector {
-  background-color: #ce9e7a;
-  border: 3px solid black;
-  border-radius: 9px;
-  padding: 5px 20px;
-  font-size: 20px;
-  font-family: 'Montserrat', sans-serif;
-  color: black;
-  width: 229px;
-  height: 41px;
-  cursor: pointer;
-}
-
-.input-label {
-  font-size: 22px;
-  font-weight: bold;
-  color: black;
-  margin-top: 10px;
-}
-
-.input-field {
-  background-color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 22px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
-  color: #494949;
-  width: 301px;
+.popup-icon {
   height: 40px;
-}
-
-.input-field::placeholder {
-  color: #aaaaaa;
-}
-
-.validation-error {
-  color: #ff3b30;
-  font-size: 14px;
-  font-weight: 300;
-  margin-top: -10px;
-  text-align: center;
-}
-
-.save-button {
-  width: 228px;
-  height: 50px;
-  margin-top: 10px;
-}
-
-/* Popup/Error Modal */
-.popup-modal {
-  width: 393px;
-  height: 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+  width: 40px;
 }
 
 .popup-message {
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 9px;
-  padding: 20px 35px;
-  font-size: 22px;
-  color: black;
+  z-index: 21;
+  font-size: 28px;
+  font-weight: var(--fw-bold);
+  color: var(--color-text-span);
   text-align: center;
-  width: 301px;
+  line-height: 1.4;
+  padding: 0 20px;
 }
 
-.close-button {
-  width: 190px;
-  height: 60px;
-}
-
-/* Scrollbar Styles */
-.modal::-webkit-scrollbar {
-  width: 8px;
-}
-
-.modal::-webkit-scrollbar-track {
-  background: #fff2ea;
-}
-
-.modal::-webkit-scrollbar-thumb {
-  background: #ce9e7a;
-  border-radius: 4px;
-}
-
-.modal::-webkit-scrollbar-thumb:hover {
-  background: #a66c4a;
-}
-
-/* Auth Page */
-
-.logout-button {
-  margin-top: 16px;
-  background: transparent;
+.popup-btn {
+  width: 160px;
+  height: 50px;
+  z-index: 21;
+  background: var(--color-button);
   border: none;
-  color: var(--color-text, #888);
-  font-size: 14px;
+  border-radius: 30px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: var(--fw-black);
+  color: var(--color-primary);
   cursor: pointer;
-  text-decoration: underline;
 }
 
-/* ── Wrapper ── */
+/* ════════════════════════════════════════
+   AUTH MODAL
+════════════════════════════════════════ */
 .auth-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100px;
+  min-height: 844px;
+  background-color: var(--color-primary);
+  border-radius: 30px;
 }
 
-/* ── Modal card ── */
 .auth-modal {
-  position: static;
   width: 100%;
-  max-width: 360px;
-  padding: 32px 28px;
+  max-width: 340px;
+  padding: 40px 28px;
   box-sizing: border-box;
-
-  /* inherit existing .modal styles — add extras here if needed */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* ── Title ── */
 .auth-title {
-  /* keep existing .modal-header styles */
-  text-align: center;
-  margin-bottom: 28px;
   font-size: 38px;
+  font-weight: var(--fw-black);
+  color: var(--color-accent);
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-/* ── Field group (label + input together) ── */
 .auth-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 20px;
-}
-
-.auth-field .input-label {
-  /* keep existing .input-label styles */
-  margin-bottom: 0; /* reset if .input-label has its own bottom margin */
-}
-
-.auth-field .input-field {
-  /* keep existing .input-field styles */
   width: 100%;
-  box-sizing: border-box;
 }
 
-/* ── Error message ── */
-.auth-error {
-  /* keep existing .validation-error styles */
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  border-radius: 4px;
-
-  /* override: make sure it doesn't overflow into other elements */
-  display: block;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-/* ── Success message ── */
-.auth-message {
-  color: green;
-  font-size: 14px;
+.auth-field label {
+  font-weight: var(--fw-black);
+  font-size: 18px;
+  color: var(--color-accent);
   text-align: center;
-  margin-bottom: 16px;
 }
 
-/* ── Buttons container ── */
+.auth-field input {
+  height: 50px;
+  width: 100%;
+  background-color: white;
+  border: 2px solid var(--color-accent);
+  border-radius: 30px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--color-button);
+  outline: none;
+  text-align: center;
+}
+
+.auth-field input::placeholder {
+  color: rgba(240, 108, 120, 0.5);
+}
+
+.auth-error {
+  color: #cc2222;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  text-align: center;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.auth-message {
+  color: #1a7a1a;
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
 .auth-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
   margin-top: 8px;
-}
-
-/* ── Primary submit button ── */
-.auth-submit {
   width: 100%;
-  /* inherits .button .save-button styles */
 }
 
-/* ── Switch mode link-style button ── */
+.auth-submit {
+  height: 50px;
+  width: 100%;
+  background-color: var(--color-button);
+  border: none;
+  border-radius: 30px;
+  font-size: 20px;
+  font-weight: var(--fw-black);
+  font-family: 'Nunito', sans-serif;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.auth-submit:hover {
+  transform: scale(1.03);
+}
+.auth-submit:active {
+  transform: scale(0.97);
+}
+
 .auth-switch {
   background: transparent;
   border: none;
-  box-shadow: none;
-  padding: 0;
-  color: var(--color-text, #333);
+  color: var(--color-accent);
   font-size: 14px;
+  font-family: 'Nunito', sans-serif;
   text-decoration: underline;
   cursor: pointer;
-  text-align: center;
 }
 
 .auth-switch:hover {
   opacity: 0.7;
+}
+
+.logout-button-nav {
+  background: transparent;
+  border: none;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 5px;
 }

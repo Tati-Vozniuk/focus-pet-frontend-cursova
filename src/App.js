@@ -36,9 +36,13 @@ function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') return;
-
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setSession((prev) => {
+          if (prev?.user?.id === session?.user?.id) return prev;
+          return session;
+        });
+      }
       if (event === 'SIGNED_OUT') {
         PetService.clearCache();
         setSession(null);
@@ -99,12 +103,7 @@ function App() {
     return (
       <div
         className="app-container"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
         <p>Loading...</p>
       </div>
@@ -119,12 +118,7 @@ function App() {
     return (
       <div
         className="app-container"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
         <p>Loading...</p>
       </div>
@@ -132,7 +126,7 @@ function App() {
   }
 
   return (
-    <div className="app-container" style={{ paddingBottom: '40px' }}>
+    <div className="app-container">
       <MainView
         petState={petState}
         onOpenFeed={() => setShowFeedModal(true)}
@@ -141,6 +135,16 @@ function App() {
         refreshPetState={fetchPetState}
         onLogout={handleLogout}
       />
+
+      {/* Navbar — прямий flex-дитина app-container, тому margin-top: auto працює */}
+      <nav className="bottom-navbar">
+        <div className="navbar-icon button" onClick={() => window.location.reload()}>
+          <img src={`${process.env.PUBLIC_URL}/images/home.svg`} alt="Home" />
+        </div>
+        <div className="navbar-icon button" onClick={() => setShowSettingsModal(true)}>
+          <img src={`${process.env.PUBLIC_URL}/images/settings.svg`} alt="Settings" />
+        </div>
+      </nav>
 
       {showFeedModal && petState && (
         <FeedModal
