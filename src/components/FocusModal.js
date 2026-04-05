@@ -148,19 +148,33 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
 
       <div className="top-card-section focus-card">
         <button className="back button" onClick={handleClose}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 12H5" stroke="#F06C78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 19L5 12L12 5" stroke="#F06C78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 12H5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M12 19L5 12L12 5"
+              stroke="#F06C78"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
 
         <h1 className="focus-screen-title">Time to focus</h1>
 
-        <img
-          src={getAnimalImage(petState.animalImagePath)}
-          alt="Pet"
-          className="focus-pet-image"
-        />
+        <img src={getAnimalImage(petState.animalImagePath)} alt="Pet" className="focus-pet-image" />
 
         <div className="big-timer-display">{formatTime()}</div>
 
@@ -195,5 +209,6 @@ function FocusModal({ petState, onClose, refreshPetState, onComplete }) {
     </div>
   );
 }
+
 
 export default FocusModal;

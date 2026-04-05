@@ -104,7 +104,10 @@ function App() {
 
   if (session === undefined) {
     return (
-      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div
+        className="app-container"
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      >
         <p>Loading...</p>
       </div>
     );
@@ -116,7 +119,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div
+        className="app-container"
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      >
         <p>Loading...</p>
       </div>
     );
@@ -134,11 +140,7 @@ function App() {
         />
 
         {showReward && (
-          <PopupModal
-            isReward
-            rewardAmount={rewardAmount}
-            onClose={() => setShowReward(false)}
-          />
+          <PopupModal isReward rewardAmount={rewardAmount} onClose={() => setShowReward(false)} />
         )}
       </div>
     );
@@ -183,16 +185,10 @@ function App() {
         />
       )}
 
-      {showPopup && (
-        <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />
-      )}
+      {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
 
       {showReward && (
-        <PopupModal
-          isReward
-          rewardAmount={rewardAmount}
-          onClose={() => setShowReward(false)}
-        />
+        <PopupModal isReward rewardAmount={rewardAmount} onClose={() => setShowReward(false)} />
       )}
     </div>
   );
