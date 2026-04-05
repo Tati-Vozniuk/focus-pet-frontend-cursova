@@ -11,11 +11,7 @@ function PopupModal({ message, onClose, isReward, rewardAmount }) {
           <div className="reward-display">
             <div className="popup-reward-amount">
               <span className="popup-title">{rewardAmount}</span>
-              <img
-                className="popup-icon"
-                src={`${process.env.PUBLIC_URL}/images/coin.png`}
-                alt="Coin"
-              />
+              <img className="popup-icon" src="/images/coin.png" alt="Coin" />
             </div>
             <button className="popup-btn button" onClick={onClose}>
               Claim

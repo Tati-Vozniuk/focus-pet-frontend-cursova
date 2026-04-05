@@ -19,14 +19,17 @@ function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState(0);
+  const [showReward, setShowReward] = useState(false);
 
   const showError = (message) => {
     setPopupMessage(message);
     setShowPopup(true);
   };
-  const showSuccess = (message) => {
-    setPopupMessage(message);
-    setShowPopup(true);
+
+  const showSuccess = (minutes) => {
+    setRewardAmount(minutes);
+    setShowReward(true);
   };
 
   useEffect(() => {
@@ -91,7 +94,7 @@ function App() {
 
   const handleFocusComplete = (minutes) => {
     setShowFocusModal(false);
-    showSuccess(`You've earned ${minutes} ⍟`);
+    showSuccess(minutes);
   };
 
   const handleLogout = async () => {
@@ -136,7 +139,6 @@ function App() {
         onLogout={handleLogout}
       />
 
-      {/* Navbar — прямий flex-дитина app-container, тому margin-top: auto працює */}
       <nav className="bottom-navbar">
         <div className="navbar-icon button" onClick={() => window.location.reload()}>
           <img src={`${process.env.PUBLIC_URL}/images/home.svg`} alt="Home" />
@@ -174,6 +176,10 @@ function App() {
       )}
 
       {showPopup && <PopupModal message={popupMessage} onClose={() => setShowPopup(false)} />}
+
+      {showReward && (
+        <PopupModal isReward rewardAmount={rewardAmount} onClose={() => setShowReward(false)} />
+      )}
     </div>
   );
 }
